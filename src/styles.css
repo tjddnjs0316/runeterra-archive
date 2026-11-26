@@ -1,0 +1,256 @@
+/* ───────────── 기본 ───────────── */
+html, body { margin: 0; background: #070b14; }
+
+.lol {
+  --bg: #070b14; --panel: rgba(16, 22, 36, 0.72); --panel-solid: #101624;
+  --line: rgba(200, 170, 110, 0.25); --line-soft: rgba(255, 255, 255, 0.08);
+  --gold: #c8aa6e; --gold-light: #f0e6d2; --teal: #0ac8b9;
+  --text: #e9e7e2; --muted: #8e97aa; --ok: #2fbf71; --danger: #e5484d;
+  --ok-bg: #1f7a4d; --part-bg: #9a7a1c; --no-bg: #8a2c31;
+  position: relative; min-height: 100vh; color: var(--text); background: var(--bg);
+  font-family: 'Noto Sans KR', system-ui, sans-serif; line-height: 1.6;
+}
+.lol *, .lol *::before, .lol *::after { box-sizing: border-box; }
+.lol [hidden] { display: none !important; }
+.lol ::-webkit-scrollbar { width: 8px; height: 8px; }
+.lol ::-webkit-scrollbar-thumb { background: rgba(200, 170, 110, 0.3); border-radius: 8px; }
+.lol ::-webkit-scrollbar-track { background: transparent; }
+.lol .muted { color: var(--muted); }
+.lol .small { font-size: 13px; }
+.row-gap { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* 배경: 은은한 빛 + 현재 챔피언 그림을 크게 흐리게 깔아 둔다. */
+.lol-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(10, 200, 185, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, rgba(200, 170, 110, 0.12), transparent 60%),
+    var(--bg); }
+.lol-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  filter: blur(56px) saturate(1.3); opacity: 0.22; transform: scale(1.15); animation: lol-fade 0.8s ease; }
+.lol-inner { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 28px 20px 40px; }
+.lol-footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 11px; line-height: 1.7; text-align: center; }
+@keyframes lol-fade { from { opacity: 0; } }
+@keyframes lol-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ───────────── 머리말 + 탭 ───────────── */
+.lol-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.lol-logo small { font-family: 'Cinzel', serif; letter-spacing: 0.32em; color: var(--gold); font-size: 12px; }
+.lol-logo h1 { margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -0.02em;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tabs { display: flex; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); backdrop-filter: blur(12px); }
+.tab { border: 0; background: transparent; color: var(--muted); padding: 8px 20px; border-radius: 999px; font: inherit; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+.tab:hover { color: var(--text); }
+.tab.active { background: linear-gradient(180deg, #d4b77c, #a07f45); color: #1a1408; }
+
+/* ───────────── 공통 버튼 ───────────── */
+.btn { border: 1px solid var(--line); background: rgba(255, 255, 255, 0.04); color: var(--gold-light); padding: 8px 16px; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; transition: 0.15s; }
+.btn:hover:not(:disabled) { border-color: var(--gold); background: rgba(200, 170, 110, 0.12); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(180deg, #d4b77c, #a07f45); color: #1a1408; border-color: transparent; }
+.btn-primary:hover:not(:disabled) { background: linear-gradient(180deg, #e0c48a, #ad8b50); }
+.small-btn { padding: 4px 12px; font-size: 12px; }
+.link { color: var(--teal); text-decoration: none; font-size: 13px; font-weight: 500; }
+.link:hover { text-decoration: underline; }
+
+/* ───────────── 도감 ───────────── */
+.layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 24px; align-items: start; }
+.sidebar { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 32px); }
+.dex-main { scroll-margin-top: 16px; }
+.panel { background: var(--panel); border: 1px solid var(--line-soft); border-radius: 18px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.sidebar .panel { padding: 14px; }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.nav .pos { color: var(--muted); font-size: 13px; }
+.nav .pos b { color: var(--text); }
+
+.search { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-soft); border-radius: 12px; padding: 0 12px; transition: border-color 0.2s; }
+.search:focus-within { border-color: var(--gold); }
+.search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--text); font: inherit; padding: 10px 0; }
+.search input::placeholder { color: var(--muted); }
+.search .count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.icon-btn { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; padding: 0 2px; }
+.icon-btn:hover { color: var(--text); }
+
+.filter-label { font-size: 11px; letter-spacing: 0.14em; color: var(--muted); margin: 12px 0 6px; font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line-soft); background: rgba(255, 255, 255, 0.03); color: var(--text); padding: 3px 10px; border-radius: 999px; font: inherit; font-size: 12px; cursor: pointer; transition: 0.15s; }
+.chip:hover { border-color: var(--gold); }
+.chip.active { background: var(--gold); border-color: var(--gold); color: #1a1408; font-weight: 700; }
+.chip .n { opacity: 0.6; margin-left: 3px; font-size: 11px; }
+
+.grid-panel { flex: 1; min-height: 220px; display: flex; flex-direction: column; overflow: hidden; }
+.champ-grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px 8px; align-content: start; padding: 4px 2px; }
+.champ-grid .empty { grid-column: 1 / -1; text-align: center; }
+.champ { background: transparent; border: 0; padding: 0; color: inherit; cursor: pointer; text-align: center; font: inherit; min-width: 0; }
+.champ img { width: 100%; aspect-ratio: 1; border-radius: 12px; border: 2px solid transparent; display: block; transition: transform 0.15s, border-color 0.15s; }
+.champ:hover img { transform: translateY(-2px); border-color: rgba(200, 170, 110, 0.5); }
+.champ.active img { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200, 170, 110, 0.25); }
+.champ span { display: block; font-size: 11px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.champ.active span { color: var(--gold-light); font-weight: 700; }
+
+/* 챔피언 카드 */
+.card { background: var(--panel-solid); border: 1px solid var(--line-soft); border-radius: 20px; overflow: hidden; animation: lol-rise 0.4s ease; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45); }
+.hero { position: relative; aspect-ratio: 1215 / 717; max-height: 540px; width: 100%; overflow: hidden; }
+.hero img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+.hero-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(16, 22, 36, 0.6) 68%, var(--panel-solid) 100%); }
+.hero-text { position: absolute; left: 28px; right: 28px; bottom: 20px; }
+.eyebrow { margin: 0; font-family: 'Cinzel', serif; letter-spacing: 0.25em; color: var(--gold); font-size: 13px; text-transform: uppercase; }
+.hero h2 { margin: 2px 0 0; font-size: clamp(32px, 5vw, 54px); font-weight: 900; line-height: 1.1; letter-spacing: -0.02em; text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6); }
+.hero-title { margin: 4px 0 12px; color: var(--gold-light); opacity: 0.9; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.badge { padding: 3px 11px; border-radius: 999px; font-size: 12px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.16); backdrop-filter: blur(6px); }
+.badge.gold { background: rgba(200, 170, 110, 0.22); border-color: rgba(200, 170, 110, 0.65); color: var(--gold-light); font-weight: 700; }
+
+.section { padding: 26px 28px; border-top: 1px solid var(--line-soft); }
+.section-title { margin: 0 0 16px; font-size: 13px; letter-spacing: 0.18em; color: var(--gold); font-weight: 700; display: flex; align-items: center; gap: 12px; }
+.section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+.sub-title { font-size: 14px; margin: 22px 0 10px; color: var(--gold-light); }
+
+.quote { margin: 0 0 20px; padding: 16px 20px; border-left: 3px solid var(--gold); background: linear-gradient(90deg, rgba(200, 170, 110, 0.12), transparent); border-radius: 0 12px 12px 0; font-size: 17px; color: var(--gold-light); }
+.quote cite { display: block; margin-top: 6px; font-size: 13px; color: var(--muted); font-style: normal; }
+
+.region { border-radius: 14px; overflow: hidden; margin-bottom: 22px; border: 1px solid var(--line); background: var(--panel-solid) center / cover no-repeat; }
+.region-body { padding: 20px 22px; background: linear-gradient(90deg, rgba(7, 11, 20, 0.94) 0%, rgba(7, 11, 20, 0.78) 60%, rgba(7, 11, 20, 0.45) 100%); }
+.region-body small { color: var(--gold); letter-spacing: 0.16em; font-size: 11px; font-weight: 700; }
+.region-body h4 { margin: 2px 0 8px; font-size: 22px; }
+.region-body p { margin: 0 0 10px; color: #cfd3dc; font-size: 14px; max-width: 640px; }
+
+.lore p { margin: 0 0 14px; color: #d4d7de; font-size: 15px; line-height: 1.9; }
+.lore.collapsed { position: relative; max-height: 240px; overflow: hidden; }
+.lore.collapsed::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(transparent, var(--panel-solid)); }
+.relations { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.relation { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 14px; border: 1px solid var(--line-soft); background: rgba(255, 255, 255, 0.03); color: var(--text); font: inherit; text-align: left; cursor: pointer; transition: 0.15s; }
+.relation:hover { border-color: var(--gold); background: rgba(200, 170, 110, 0.08); transform: translateY(-1px); }
+.relation img { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--line); }
+.relation-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.relation-head strong { font-size: 15px; }
+.relation-label { padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; color: var(--gold-light); background: rgba(200, 170, 110, 0.18); border: 1px solid rgba(200, 170, 110, 0.45); }
+.relation p { margin: 4px 0 0; font-size: 13px; line-height: 1.6; color: #c4c9d4; }
+.credit { margin: 10px 0 0; font-size: 11px; color: var(--muted); }
+.credit .link { font-size: 11px; }
+
+.bars { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 28px; }
+.bar-row { display: grid; grid-template-columns: 76px 1fr 24px; align-items: center; gap: 10px; font-size: 13px; }
+.bar { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--teal), #6ff0e5); }
+.bar-row.gold .bar i { background: linear-gradient(90deg, #a07f45, #f0c674); }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; margin-top: 20px; }
+.stat { padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line-soft); }
+.stat small { display: block; color: var(--muted); font-size: 11px; }
+.stat b { font-size: 18px; }
+
+.skills { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.skill { display: flex; gap: 16px; padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line-soft); }
+.skill-icon { position: relative; flex-shrink: 0; align-self: flex-start; }
+.skill-icon img { width: 52px; height: 52px; border-radius: 10px; border: 1px solid var(--line); display: block; }
+.skill-icon span { position: absolute; right: -6px; bottom: -6px; width: 22px; height: 22px; border-radius: 6px; background: var(--bg); border: 1px solid var(--gold); color: var(--gold); font-size: 11px; font-weight: 900; display: grid; place-items: center; }
+.skill strong { font-size: 15px; }
+.skill .cd { color: var(--muted); font-size: 12px; margin-left: 8px; font-weight: 400; }
+.skill p { margin: 4px 0 0; color: #c4c9d4; font-size: 14px; }
+
+.skins { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
+.skin { flex-shrink: 0; width: 108px; background: transparent; border: 0; padding: 0; color: var(--text); font: inherit; cursor: pointer; scroll-snap-align: start; text-align: center; }
+.skin img { width: 100%; aspect-ratio: 308 / 560; object-fit: cover; border-radius: 12px; border: 2px solid transparent; display: block; transition: 0.15s; }
+.skin:hover img { border-color: rgba(200, 170, 110, 0.5); }
+.skin.active img { border-color: var(--gold); box-shadow: 0 0 18px rgba(200, 170, 110, 0.35); }
+.skin span { display: block; font-size: 12px; margin-top: 6px; line-height: 1.3; color: var(--muted); }
+.skin.active span { color: var(--gold-light); }
+
+.center-msg { text-align: center; padding: 90px 20px; color: var(--muted); }
+.spinner { width: 34px; height: 34px; margin: 0 auto 14px; border-radius: 50%; border: 3px solid rgba(200, 170, 110, 0.2); border-top-color: var(--gold); animation: lol-spin 0.8s linear infinite; }
+@keyframes lol-spin { to { transform: rotate(360deg); } }
+
+/* ───────────── 게임 공통 (퀴즈·추리) ───────────── */
+.game-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.game-top h2 { margin: 0; font-size: 24px; }
+.game-top p { margin: 2px 0 0; font-size: 14px; }
+.score { display: flex; gap: 8px; }
+.score div { padding: 8px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line-soft); text-align: center; min-width: 76px; }
+.score small { display: block; font-size: 11px; color: var(--muted); }
+.score b { font-size: 20px; color: var(--gold-light); }
+.zoom { aspect-ratio: 1215 / 717; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+.zoom img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.hint { display: inline-block; padding: 8px 14px; border-radius: 10px; background: rgba(10, 200, 185, 0.08); border: 1px dashed rgba(10, 200, 185, 0.45); font-size: 14px; color: #bff3ee; }
+.hint.locked { background: transparent; border-color: var(--line-soft); color: var(--muted); font-size: 12px; }
+
+/* 퀴즈 */
+.quiz { max-width: 780px; margin: 0 auto; }
+.quiz .hint { display: block; margin-top: 14px; }
+.quiz-card { padding: 24px; animation: lol-rise 0.35s ease; }
+.quiz-q { margin: 0 0 4px; color: var(--gold); font-size: 12px; letter-spacing: 0.16em; font-weight: 700; }
+.quiz-prompt { margin: 0 0 18px; font-size: 22px; font-weight: 700; }
+.big-title { padding: 44px 20px; text-align: center; border-radius: 14px; border: 1px solid var(--line); background: radial-gradient(circle at 50% 0%, rgba(200, 170, 110, 0.2), transparent 70%); font-size: clamp(26px, 5vw, 40px); font-weight: 900; color: var(--gold-light); }
+.big-skill { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 32px; border-radius: 14px; border: 1px solid var(--line); background: radial-gradient(circle at 50% 0%, rgba(10, 200, 185, 0.16), transparent 70%); }
+.big-skill img { width: 96px; height: 96px; border-radius: 16px; border: 2px solid var(--gold); box-shadow: 0 0 30px rgba(200, 170, 110, 0.3); }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.choice { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line-soft); background: rgba(255, 255, 255, 0.04); color: var(--text); font: inherit; font-weight: 700; text-align: left; cursor: pointer; transition: 0.15s; }
+.choice small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.choice:hover:not(:disabled) { border-color: var(--gold); background: rgba(200, 170, 110, 0.1); transform: translateY(-1px); }
+.choice:disabled { cursor: default; }
+.choice.correct { border-color: var(--ok); background: rgba(47, 191, 113, 0.16); }
+.choice.wrong { border-color: var(--danger); background: rgba(229, 72, 77, 0.16); }
+.choice.dim { opacity: 0.4; }
+.result { margin-top: 16px; display: flex; gap: 14px; align-items: center; padding: 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-soft); animation: lol-rise 0.3s ease; }
+.result img { width: 64px; height: 64px; border-radius: 12px; }
+.result h4 { margin: 0; font-size: 18px; }
+.result.ok h4 { color: var(--ok); }
+.result.no h4 { color: #ff8a8d; }
+.result p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.quiz-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; flex-wrap: wrap; }
+
+/* ───────────── 추리 게임 ───────────── */
+.guess { max-width: 920px; margin: 0 auto; }
+.mode-switch { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.mode-switch .chip { font-size: 13px; padding: 5px 14px; }
+
+.guess-input { padding: 16px; position: relative; }
+.suggest { list-style: none; margin: 8px 0 0; padding: 6px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px; }
+.suggest button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.suggest button:hover { background: rgba(200, 170, 110, 0.12); }
+.suggest li:first-child button { background: rgba(200, 170, 110, 0.08); }
+.suggest img { width: 32px; height: 32px; border-radius: 8px; }
+.suggest span { font-weight: 700; font-size: 14px; }
+.suggest small { color: var(--muted); font-size: 11px; margin-left: auto; }
+.hints { margin-top: 12px; }
+.hint-zoom { margin-top: 12px; max-width: 360px; }
+
+.board { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; overflow-x: auto; }
+.board-head, .board-row { display: grid; grid-template-columns: 1.4fr 1fr 1.3fr 0.9fr 0.9fr 0.9fr; gap: 6px; min-width: 620px; }
+.board-head span { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; text-align: center; }
+.board-head span:first-child { text-align: left; padding-left: 8px; }
+.cell { min-height: 58px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px; border-radius: 10px; font-size: 13px; font-weight: 700; line-height: 1.3; color: #fff;
+  animation: cell-flip 0.5s ease both; }
+.cell.ok { background: var(--ok-bg); box-shadow: inset 0 0 0 1px rgba(47, 191, 113, 0.6); }
+.cell.part { background: var(--part-bg); box-shadow: inset 0 0 0 1px rgba(240, 198, 80, 0.6); }
+.cell.no { background: var(--no-bg); box-shadow: inset 0 0 0 1px rgba(229, 72, 77, 0.45); }
+.champ-cell { justify-content: flex-start; gap: 10px; background: var(--panel); border: 1px solid var(--line-soft); animation: lol-rise 0.3s ease both; }
+.champ-cell img { width: 40px; height: 40px; border-radius: 8px; }
+@keyframes cell-flip { from { opacity: 0; transform: rotateX(90deg); } to { opacity: 1; transform: none; } }
+
+.win { overflow: hidden; animation: lol-rise 0.4s ease; }
+.win-art { aspect-ratio: 1215 / 520; background: center 20% / cover no-repeat; position: relative; display: flex; align-items: flex-end; }
+.win-art::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(7, 11, 20, 0.9)); }
+.win-text { position: relative; padding: 20px 24px; }
+.win-text h3 { margin: 0; font-size: clamp(30px, 5vw, 46px); font-weight: 900; line-height: 1.1; }
+.win-text p { margin: 4px 0 0; color: var(--gold-light); }
+.win-actions { padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.dot.ok { background: var(--ok-bg); }
+.dot.part { background: var(--part-bg); }
+.dot.no { background: var(--no-bg); }
+
+/* ───────────── 반응형 ───────────── */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; max-height: none; }
+  .grid-panel { max-height: 360px; }
+}
+@media (max-width: 560px) {
+  .lol-inner { padding: 20px 14px 32px; }
+  .section { padding: 22px 18px; }
+  .hero-text { left: 18px; right: 18px; bottom: 14px; }
+  .choices { grid-template-columns: 1fr; }
+  .tab { padding: 8px 14px; }
+}
