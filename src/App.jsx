@@ -139,6 +139,7 @@ export default function App() {
                     onOpenChampion={openChampion}
                     onOpenStory={setStory}
                     soundOn={soundOn}
+                    storyOpen={story !== null}
                 />
             )}
             {view === 'timeline' && (
@@ -151,7 +152,7 @@ export default function App() {
                 />
             )}
 
-            {story &&<StoryReader story={story} onClose={() => setStory(null)}/>}
+            {story && <StoryReader story={story} onClose={() => setStory(null)} soundOn={soundOn}/>}
         </Frame>
     );
 }

@@ -1,33 +1,7 @@
 import { useEffect, useState } from 'react';
 import { iconUrl, loadFaction, loadStories } from '../lol/api.js';
 import { REGION_MUSIC } from '../lol/regionMusic.js';
-
-/*
-    지역 배경음악 플레이어 (오른쪽 아래 작은 창)
-    유튜브 영상을 작게 보여 주면서 재생한다. (유튜브 약관상 영상을 숨기고 소리만 틀 수는 없다)
-    지역을 클릭해서 들어왔기 때문에 autoplay=1 로 바로 재생된다. 대사 소리를 꺼 두었다면 자동 재생하지 않는다.
-    loop=1 은 같은 영상 id 를 playlist 에도 넣어야 반복된다.
-*/
-function MusicPlayer({music, autoPlay}) {
-    const [open, setOpen] = useState(true);
-    if (!open) {
-        return <button className="music-reopen" onClick={() => setOpen(true)}>♪ 배경음악</button>;
-    }
-    const params = `autoplay=${autoPlay ? 1 : 0}&loop=1&playlist=${music.youtube}&rel=0`;
-    return (
-        <div className="music-player">
-            <div className="music-head">
-                <span>♪ {music.title}</span>
-                <button onClick={() => setOpen(false)} aria-label="배경음악 닫기">✕</button>
-            </div>
-            <iframe
-                src={`https://www.youtube-nocookie.com/embed/${music.youtube}?${params}`}
-                title={`배경음악: ${music.title}`}
-                allow="autoplay; encrypted-media"
-            />
-        </div>
-    );
-}
+import MusicPlayer from './MusicPlayer.jsx';
 
 // 지역 순서: 가나다순, '무소속'은 맨 뒤
 export function sortRegions(factions) {
@@ -86,7 +60,7 @@ function RegionList({factions, champions, stories, onSelect}) {
 }
 
 // 지역 페이지
-function RegionPage({faction, champions, stories, onBack, onOpenChampion, onOpenStory, soundOn}) {
+function RegionPage({faction, champions, stories, onBack, onOpenChampion, onOpenStory, soundOn, storyOpen}) {
     const [detail, setDetail] = useState(null);   // 유니버스 지역 상세 (무소속은 없음)
     const [showAll, setShowAll] = useState(false);
     const [photo, setPhoto] = useState(null);     // 크게 보는 풍경 사진
@@ -207,7 +181,8 @@ function RegionPage({faction, champions, stories, onBack, onOpenChampion, onOpen
             {detail?.failed && <p className="section muted">지역 상세 정보를 불러오지 못했어요.</p>}
 
             {/* 배경음악이 있는 지역만. 지역 페이지를 나가면 컴포넌트가 사라지면서 음악도 멈춘다. */}
-            {REGION_MUSIC[faction.slug] && <MusicPlayer music={REGION_MUSIC[faction.slug]} autoPlay={soundOn}/>}
+            {/* 소설 창이 열려 있으면 소설 음악이 나오므로 지역 음악은 잠시 내린다. (두 곡이 겹치지 않게) */}
+            {REGION_MUSIC[faction.slug] && !storyOpen && <MusicPlayer music={REGION_MUSIC[faction.slug]} autoPlay={soundOn}/>}
 
             {/* 풍경 사진 크게 보기: 아무 데나 누르면 닫힌다. */}
             {photo && (
@@ -226,7 +201,7 @@ function RegionPage({faction, champions, stories, onBack, onOpenChampion, onOpen
     지역 화면
     regionSlug 가 없으면 지역 목록, 있으면 그 지역 페이지를 보여준다. (App 이 regionSlug 를 가지고 있다)
 */
-export default function Regions({factions, champions, regionSlug, setRegionSlug, onOpenChampion, onOpenStory, soundOn}) {
+export default function Regions({factions, champions, regionSlug, setRegionSlug, onOpenChampion, onOpenStory, soundOn, storyOpen}) {
     const [stories, setStories] = useState(null);
 
     useEffect(() => {
@@ -257,6 +232,7 @@ export default function Regions({factions, champions, regionSlug, setRegionSlug,
             onOpenChampion={onOpenChampion}
             onOpenStory={onOpenStory}
             soundOn={soundOn}
+            storyOpen={storyOpen}
         />
     );
 }

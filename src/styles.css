@@ -107,7 +107,24 @@ html, body { margin: 0; background: #070b14; }
 /* 챔피언 카드 */
 .card { background: var(--panel-solid); border: 1px solid var(--line-soft); border-radius: 20px; overflow: hidden; animation: lol-rise 0.4s ease; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45); }
 .hero { position: relative; aspect-ratio: 1215 / 717; max-height: 540px; width: 100%; overflow: hidden; }
-.hero img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+/* 그림 모션: 바깥(hero-motion)은 마우스 시차, 안쪽(img)은 들어오기 + 천천히 움직이기 */
+.hero-motion { position: absolute; inset: -24px; transform: translate(calc(var(--mx, 0) * -22px), calc(var(--my, 0) * -14px)); transition: transform 0.35s ease-out; }
+.hero img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; transform-origin: 50% 30%;
+  animation: hero-in 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both, hero-drift 22s ease-in-out 1.1s infinite alternate; }
+@keyframes hero-in { from { opacity: 0; transform: scale(1.14); filter: blur(6px) brightness(1.4); } to { opacity: 1; transform: scale(1.03); filter: none; } }
+@keyframes hero-drift { from { transform: scale(1.03) translate(0, 0); } to { transform: scale(1.1) translate(-1.6%, -1.2%); } }
+/* 처음 뜰 때 빛이 한 번 스쳐 지나간다. */
+.hero::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255, 240, 210, 0.22) 50%, transparent 65%); transform: translateX(-100%); animation: hero-sweep 1.6s ease-out 0.3s both; }
+@keyframes hero-sweep { to { transform: translateX(100%); } }
+/* 떠오르는 불씨 */
+.hero-embers { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hero-embers i { position: absolute; bottom: -10px; border-radius: 50%; background: #ffd58a; box-shadow: 0 0 8px 2px rgba(255, 190, 90, 0.7); opacity: 0; animation: ember-rise linear infinite; }
+@keyframes ember-rise { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 0.9; } 100% { transform: translate(30px, -420px); opacity: 0; } }
+/* 움직임 줄이기를 켠 사용자에게는 모션을 끈다. */
+@media (prefers-reduced-motion: reduce) {
+  .hero img, .hero::after, .hero-embers i { animation: none; }
+  .hero-motion { transform: none; }
+}
 .hero-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(16, 22, 36, 0.6) 68%, var(--panel-solid) 100%); }
 .hero-text { position: absolute; left: 28px; right: 28px; bottom: 20px; }
 .eyebrow { margin: 0; font-family: 'Cinzel', serif; letter-spacing: 0.25em; color: var(--gold); font-size: 13px; text-transform: uppercase; }
@@ -238,12 +255,12 @@ html, body { margin: 0; background: #070b14; }
 .photo-view figcaption { margin-top: 10px; color: var(--gold-light); font-size: 14px; }
 
 /* 지역 배경음악 */
-.music-player { position: fixed; right: 16px; bottom: 16px; z-index: 40; width: 280px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-solid); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); animation: lol-rise 0.3s ease; }
+.music-player { position: fixed; right: 16px; bottom: 16px; z-index: 60; width: 280px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-solid); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); animation: lol-rise 0.3s ease; }
 .music-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; color: var(--gold-light); }
 .music-head span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .music-head button { border: 0; background: transparent; color: var(--muted); cursor: pointer; }
 .music-player iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
-.music-reopen { position: fixed; right: 16px; bottom: 16px; z-index: 40; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-solid); color: var(--gold-light); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.music-reopen { position: fixed; right: 16px; bottom: 16px; z-index: 60; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-solid); color: var(--gold-light); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 
 /* ───────────── 연대기 ───────────── */
 .timeline-page { max-width: 900px; margin: 0 auto; }

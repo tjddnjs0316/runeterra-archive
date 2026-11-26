@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { loadStory } from '../lol/api.js';
+import { REGION_MUSIC } from '../lol/regionMusic.js';
+import MusicPlayer from './MusicPlayer.jsx';
 
 /*
     단편 소설 읽기 창 (화면 위에 겹쳐 뜨는 창)
     story : stories.json 의 소설 한 편 { slug, title, image, minutes, ... }
     본문은 열 때 유니버스에서 받아 온다.
 */
-export default function StoryReader({story, onClose}) {
+export default function StoryReader({story, onClose, soundOn}) {
+    // 소설 배경음악: 등장 챔피언의 소속 지역 음악 (무소속처럼 곡이 없는 지역이면 음악 없음)
+    const music = story.regions.map(r => REGION_MUSIC[r]).find(Boolean);
     const [data, setData] = useState(null);
     const [failed, setFailed] = useState(false);
 
@@ -31,7 +35,10 @@ export default function StoryReader({story, onClose}) {
     }, [onClose]);
 
     return (
-        // 바깥 어두운 부분을 누르면 닫히고, 안쪽(article)을 누를 때는 닫히지 않게 stopPropagation
+        <>
+        {/* 플레이어는 어두운 배경 밖에 둔다. (안에 두면 플레이어를 누를 때 창이 닫혀 버린다) */}
+        {music && <MusicPlayer music={music} autoPlay={soundOn}/>}
+        {/* 바깥 어두운 부분을 누르면 닫히고, 안쪽(article)을 누를 때는 닫히지 않게 stopPropagation */}
         <div className="reader-backdrop" onClick={onClose}>
             <article className="reader" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={story.title}>
                 <button className="reader-close" onClick={onClose} aria-label="닫기">✕</button>
@@ -63,5 +70,6 @@ export default function StoryReader({story, onClose}) {
                 </div>
             </article>
         </div>
+        </>
     );
 }
