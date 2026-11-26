@@ -237,6 +237,36 @@ html, body { margin: 0; background: #070b14; }
 .photo-view img { max-width: 100%; max-height: 82vh; border-radius: 12px; }
 .photo-view figcaption { margin-top: 10px; color: var(--gold-light); font-size: 14px; }
 
+/* 지역 배경음악 */
+.music-player { position: fixed; right: 16px; bottom: 16px; z-index: 40; width: 280px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-solid); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); animation: lol-rise 0.3s ease; }
+.music-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; color: var(--gold-light); }
+.music-head span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.music-head button { border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.music-player iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
+.music-reopen { position: fixed; right: 16px; bottom: 16px; z-index: 40; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-solid); color: var(--gold-light); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+/* ───────────── 연대기 ───────────── */
+.timeline-page { max-width: 900px; margin: 0 auto; }
+.timeline-filter { margin-bottom: 20px; }
+.timeline { list-style: none; margin: 0; padding: 0 0 0 22px; border-left: 2px solid var(--line); }
+.era { position: relative; margin-bottom: 26px; }
+.era-title { position: relative; margin: 0 0 12px; font-size: 13px; letter-spacing: 0.18em; color: var(--gold); }
+.era-title::before { content: ''; position: absolute; left: -30px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(200, 170, 110, 0.2); }
+.event { padding: 16px 18px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--line-soft); background: var(--panel); backdrop-filter: blur(12px); transition: border-color 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; gap: 10px; }
+.event.flash { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200, 170, 110, 0.3); }
+.event-head { display: flex; align-items: center; gap: 8px; }
+.event h4 { margin: 0; font-size: 18px; }
+.event p { margin: 0; font-size: 14px; line-height: 1.8; color: #d4d7de; }
+.cross-badge { padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #1a1408; background: var(--teal); }
+.event-champs { display: flex; flex-wrap: wrap; gap: 6px; }
+.event-champs button { display: flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 999px; border: 1px solid var(--line-soft); background: rgba(255, 255, 255, 0.04); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+.event-champs button:hover { border-color: var(--gold); }
+.event-champs img { width: 24px; height: 24px; border-radius: 50%; }
+.event-stories, .event-links { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.story-chip, .link-btn { border: 1px solid var(--line-soft); background: transparent; color: var(--gold-light); padding: 3px 10px; border-radius: 8px; font: inherit; font-size: 12px; cursor: pointer; }
+.link-btn { color: var(--teal); }
+.story-chip:hover, .link-btn:hover { border-color: var(--gold); }
+
 /* ───────────── 반응형 ───────────── */
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }

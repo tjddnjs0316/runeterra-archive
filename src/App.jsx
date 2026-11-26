@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import Dex from './components/Dex.jsx';
 import Regions from './components/Regions.jsx';
 import StoryReader from './components/StoryReader.jsx';
+import Timeline from './components/Timeline.jsx';
 import { loadChampionList, splashUrl } from './lol/api.js';
 
-const TABS = [['champions', '챔피언'], ['regions', '지역']];
+const TABS = [['champions', '챔피언'], ['regions', '지역'], ['timeline', '연대기']];
 
 const SOUND_STORE = 'lol-sound-on';
 
@@ -137,10 +138,20 @@ export default function App() {
                     setRegionSlug={slug => { setRegionSlug(slug); window.scrollTo({top: 0}); }}
                     onOpenChampion={openChampion}
                     onOpenStory={setStory}
+                    soundOn={soundOn}
+                />
+            )}
+            {view === 'timeline' && (
+                <Timeline
+                    champions={champions}
+                    factions={factions}
+                    onOpenChampion={openChampion}
+                    onOpenRegion={openRegion}
+                    onOpenStory={setStory}
                 />
             )}
 
-            {story && <StoryReader story={story} onClose={() => setStory(null)}/>}
+            {story &&<StoryReader story={story} onClose={() => setStory(null)}/>}
         </Frame>
     );
 }
