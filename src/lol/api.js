@@ -128,6 +128,69 @@ export async function loadChampionList() {
     return {champions, factions};
 }
 
+/*
+    지역 상세: 소개글, 대표 이미지·영상, 「룬테라 이야기」 같은 영상, 풍경 갤러리, 만화 링크
+    modules 배열에 type 별로 섞여 오므로 종류별로 나눠서 돌려준다.
+*/
+export async function loadFaction(slug) {
+    const json = await fetch(`${UNIVERSE}/factions/${slug}/index.json`).then(res => res.json());
+    const modules = json.modules ?? [];
+    return {
+        overview: toParagraphs(json.faction.overview?.short),
+        image: json.faction.image?.uri ?? null,
+        video: json.faction.video?.uri ?? null,
+        videos: modules.filter(m => m.type === 'featured-video' && youtubeId(m.uri)).map(m => ({
+            title: m.title,
+            description: stripTags(m.description ?? ''),
+            youtube: youtubeId(m.uri),
+        })),
+        galleries: modules.filter(m => m.type === 'image-gallery' && m.assets?.length).map(m => ({
+            title: m['section-title'] || '풍경',
+            images: m.assets.map(a => ({src: a.uri, caption: a.title})),
+        })),
+        comics: modules.filter(m => m.type === 'link-out' && m.url).map(m => ({
+            title: m.title,
+            description: stripTags(m.description ?? ''),
+            url: `https://universe.leagueoflegends.com${m.url}`,
+            image: m.background?.uri ?? null,
+        })),
+    };
+}
+
+// 유튜브 주소에서 영상 id(11글자)만 뽑는다. watch?v=ID, youtu.be/ID 두 모양 모두
+export function youtubeId(url = '') {
+    return url.match(/(?:v=|youtu\.be\/)([\w-]{11})/)?.[1] ?? null;
+}
+
+// 지역별 단편 소설 목록 (scripts/build-stories.mjs 로 만든 파일)
+// 동적 import: 처음 필요할 때 따로 내려받는다. (첫 화면을 가볍게 하려고) 한 번 받으면 다시 받지 않는다.
+let storiesPromise = null;
+export function loadStories() {
+    storiesPromise ??= import('./stories.json').then(m => m.default);
+    return storiesPromise;
+}
+
+/*
+    단편 소설 본문
+    story-sections(장) → story-subsections(단락 묶음) → content(HTML) 모양이다.
+    <hr> 은 장면이 바뀌는 곳이라 '***' 문단으로 바꿔 둔다.
+*/
+export async function loadStory(slug) {
+    const json = await fetch(`${UNIVERSE}/story/${slug}/index.json`).then(res => res.json());
+    return {
+        title: json.story.title,
+        minutes: json['minutes-to-read'],
+        sections: json.story['story-sections'].map(sec => ({
+            title: sec.title,
+            image: sec['background-image']?.uri ?? null,
+            paragraphs: sec['story-subsections']
+                // <hr class='story-divider' /> 처럼 속성이 붙어 오기도 해서 <hr ...> 전체를 찾는다.
+                .map(sub => sub.content.replace(/<hr[^>]*>/gi, '</p>***</p>'))
+                .flatMap(html => toParagraphs(html)),
+        })),
+    };
+}
+
 // 챔피언 상세 (스킬·스킨)만 요청
 export async function loadChampionData(id) {
     const json = await fetch(`${CDN}/${version}/data/${LANG}/champion/${id}.json`).then(res => res.json());

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import Dex from './components/Dex.jsx';
+import Regions from './components/Regions.jsx';
+import StoryReader from './components/StoryReader.jsx';
 import { loadChampionList, splashUrl } from './lol/api.js';
+
+const TABS = [['champions', '챔피언'], ['regions', '지역']];
 
 const SOUND_STORE = 'lol-sound-on';
 
@@ -37,7 +41,24 @@ export default function App() {
     const [factions, setFactions] = useState(null);   // 지역 정보 (유니버스 실패 시 null)
     const [index, setIndex] = useState(0);            // 보고 있는 챔피언 순서
     const [soundOn, setSoundOn] = useState(readSound); // 챔피언을 고를 때 대사 자동 재생
+    const [view, setView] = useState('champions');    // 'champions' = 챔피언 도감, 'regions' = 지역
+    const [regionSlug, setRegionSlug] = useState(null); // 지역 화면에서 보고 있는 지역 (null = 지역 목록)
+    const [story, setStory] = useState(null);         // 읽고 있는 단편 소설 (null = 닫힘)
     const [loadError, setLoadError] = useState(false);
+
+    // 챔피언 카드의 "지역 이야기 보기" → 지역 화면의 그 지역 페이지로
+    function openRegion(slug) {
+        setRegionSlug(slug);
+        setView('regions');
+        window.scrollTo({top: 0});
+    }
+
+    // 지역 페이지의 챔피언 아이콘 → 챔피언 도감의 그 챔피언으로
+    function openChampion(c) {
+        setIndex(champions.indexOf(c));
+        setView('champions');
+        window.scrollTo({top: 0});
+    }
 
     // 목록은 처음 한 번만 요청한다.
     useEffect(() => {
@@ -65,23 +86,61 @@ export default function App() {
         return <Frame><div className="center-msg"><div className="spinner"/>챔피언 목록 불러오는 중...</div></Frame>;
     }
 
+    // 배경: 챔피언 화면은 지금 챔피언 그림, 지역 페이지는 그 지역 그림
+    const bg = view === 'champions'
+        ? splashUrl(champions[index].id)
+        : factions?.[regionSlug]?.image ?? null;
+
     return (
-        <Frame bg={splashUrl(champions[index].id)}>
+        <Frame bg={bg}>
             <header className="lol-header">
                 <div className="lol-logo">
                     <small>RUNETERRA ARCHIVE</small>
                     <h1>룬테라 아카이브</h1>
                 </div>
-                <button
-                    className={soundOn ? 'sound-toggle on' : 'sound-toggle'}
-                    onClick={() => setSoundOn(prev => !prev)}
-                    aria-pressed={soundOn}
-                >
-                    {soundOn ? '🔊 선택 대사 켜짐' : '🔇 선택 대사 꺼짐'}
-                </button>
+                <div className="header-right">
+                    <nav className="tabs">
+                        {TABS.map(([value, label]) => (
+                            <button key={value} className={view === value ? 'tab active' : 'tab'} onClick={() => setView(value)}>
+                                {label}
+                            </button>
+                        ))}
+                    </nav>
+                    <button
+                        className={soundOn ? 'sound-toggle on' : 'sound-toggle'}
+                        onClick={() => setSoundOn(prev => !prev)}
+                        aria-pressed={soundOn}
+                        title="챔피언을 고를 때 선택 대사 재생"
+                    >
+                        {soundOn ? '🔊 대사 켜짐' : '🔇 대사 꺼짐'}
+                    </button>
+                </div>
             </header>
 
-            <Dex champions={champions} factions={factions} index={index} setIndex={setIndex} soundOn={soundOn}/>
+            {/* 챔피언 화면은 hidden 으로 숨겨서, 지역에 다녀와도 검색어·필터가 그대로 남게 한다. */}
+            <div hidden={view !== 'champions'}>
+                <Dex
+                    champions={champions}
+                    factions={factions}
+                    index={index}
+                    setIndex={setIndex}
+                    soundOn={soundOn}
+                    onOpenRegion={openRegion}
+                    onOpenStory={setStory}
+                />
+            </div>
+            {view === 'regions' && (
+                <Regions
+                    factions={factions}
+                    champions={champions}
+                    regionSlug={regionSlug}
+                    setRegionSlug={slug => { setRegionSlug(slug); window.scrollTo({top: 0}); }}
+                    onOpenChampion={openChampion}
+                    onOpenStory={setStory}
+                />
+            )}
+
+            {story && <StoryReader story={story} onClose={() => setStory(null)}/>}
         </Frame>
     );
 }

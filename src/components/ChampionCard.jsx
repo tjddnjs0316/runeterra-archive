@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { TAG_KO, iconUrl, loadingUrl, passiveUrl, spellUrl, splashUrl, stripTags, toParagraphs } from '../lol/api.js';
+import { useEffect, useState } from 'react';
+import { TAG_KO, iconUrl, loadStories, loadingUrl, passiveUrl, spellUrl, splashUrl, stripTags, toParagraphs } from '../lol/api.js';
+import { StoryCard } from './Regions.jsx';
 // 챔피언 사이의 관계 설명 { Garen: { Lux: { label: '여동생', desc: '...' }, ... }, ... }
 // JSON 파일은 import 하면 바로 객체로 들어온다. (Vite 가 처리해 준다)
 import RELATIONS from '../lol/relations.json';
@@ -33,30 +34,36 @@ function Bar({label, value, gold}) {
     );
 }
 
-// 지역 소개 카드: 지역 이미지를 배경으로 깔고 소개글을 보여준다.
-function RegionCard({faction}) {
+// 지역 소개 카드: 지역 이미지를 배경으로 깔고 소개글을 보여준다. 버튼을 누르면 지역 페이지로 간다.
+function RegionCard({faction, onOpenRegion}) {
     return (
         <div className="region" style={faction.image ? {backgroundImage: `url("${faction.image}")`} : undefined}>
             <div className="region-body">
                 <small>소속 지역</small>
                 <h4>{faction.name}</h4>
                 <p>{faction.description}</p>
-                {faction.slug !== 'unaffiliated' && (
-                    <a className="link" href={`https://universe.leagueoflegends.com/ko_KR/region/${faction.slug}/`} target="_blank" rel="noreferrer">
-                        유니버스에서 {faction.name} 더 알아보기 ↗
-                    </a>
-                )}
+                <button className="btn" onClick={() => onOpenRegion(faction.slug)}>{faction.name} 이야기 보기 →</button>
             </div>
         </div>
     );
 }
 
-export default function ChampionCard({champion, summary, faction, champions, onSelect, canPlay, playing, onPlayVoice}) {
+export default function ChampionCard({champion, summary, faction, champions, onSelect, onOpenRegion, onOpenStory, canPlay, playing, onPlayVoice}) {
 
     // 지금 크게 보여줄 스킨 번호 (0 = 기본 스킨)
     const [skinNum, setSkinNum] = useState(0);
     // 스토리를 끝까지 펼쳤는지
     const [expanded, setExpanded] = useState(false);
+    // 이 챔피언이 나오는 단편 소설
+    const [stories, setStories] = useState([]);
+
+    useEffect(() => {
+        let ignore = false;
+        loadStories()
+            .then(all => { if (!ignore) setStories(all.filter(s => s.champions.includes(summary.slug))); })
+            .catch(() => {});
+        return () => { ignore = true; };
+    }, [summary.slug]);
 
     // skins 에는 크로마(색상 변형)도 섞여 있는데, 크로마는 parentSkin 값이 있고 이미지가 없다.
     const skins = champion.skins.filter(skin => skin.parentSkin === undefined);
@@ -119,7 +126,7 @@ export default function ChampionCard({champion, summary, faction, champions, onS
                     </blockquote>
                 )}
 
-                {faction && <RegionCard faction={faction}/>}
+                {faction && <RegionCard faction={faction} onOpenRegion={onOpenRegion}/>}
 
                 <h4 className="sub-title">{champion.name}의 이야기</h4>
                 <div className={isLong && !expanded ? 'lore collapsed' : 'lore'}>
@@ -136,6 +143,15 @@ export default function ChampionCard({champion, summary, faction, champions, onS
                         유니버스 원문 보기 ↗
                     </a>
                 </div>
+
+                {stories.length > 0 && (
+                    <>
+                        <h4 className="sub-title">등장하는 단편 소설 <span className="muted small">{stories.length}편</span></h4>
+                        <div className="story-grid">
+                            {stories.map(s => <StoryCard key={s.slug} story={s} champions={champions} onOpen={onOpenStory}/>)}
+                        </div>
+                    </>
+                )}
 
                 {related.length > 0 && (
                     <>

@@ -1,6 +1,6 @@
 # 룬테라 아카이브
 
-리그 오브 레전드 챔피언 도감 (React + Vite). 챔피언의 지역·세계관·관계·스킬·스킨을 보고, 선택 대사를 들을 수 있다.
+리그 오브 레전드 챔피언 도감 (React + Vite). 챔피언의 지역·세계관·관계·스킬·스킨을 보고, 선택 대사를 들을 수 있다. 지역 페이지에서는 지역 소개·영상·풍경과 단편 소설을 읽을 수 있다.
 
 ## 실행
 
@@ -9,6 +9,7 @@ npm install     # 처음 한 번
 npm run dev     # 개발 서버 → http://localhost:5173
 npm run build   # 배포용 파일을 dist/ 에 만든다
 npm run preview # 만든 dist/ 를 미리 보기
+npm run stories # 지역별 단편 소설 목록(src/lol/stories.json) 다시 만들기 (새 소설이 나왔을 때)
 ```
 
 ## 구조
@@ -16,13 +17,17 @@ npm run preview # 만든 dist/ 를 미리 보기
 ```
 src/
   main.jsx               시작점
-  App.jsx                머리말·소리 설정, 목록 요청
+  App.jsx                머리말·탭(챔피언/지역)·소리 설정, 목록 요청
   styles.css             전체 스타일
   lol/api.js             Data Dragon·유니버스 요청, 공통 도구
   lol/relations.json     챔피언 사이의 관계 설명
+  lol/stories.json       단편 소설 목록 (npm run stories 로 생성)
   components/
     Dex.jsx              도감 (검색·필터·목록)
-    ChampionCard.jsx     챔피언 상세 카드 (세계관·스킬·스킨)
+    ChampionCard.jsx     챔피언 상세 카드 (세계관·관계·소설·스킬·스킨)
+    Regions.jsx          지역 목록 + 지역 페이지
+    StoryReader.jsx      단편 소설 읽기 창
+scripts/build-stories.mjs  소설 목록 생성 스크립트
 08_lol.jsx               수업용 원본 (한 파일 버전, 앱에서는 쓰지 않음)
 ```
 

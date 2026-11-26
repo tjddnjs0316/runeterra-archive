@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vite build && gh-pages -d dist --nojekyll"
+    "deploy": "vite build && gh-pages -d dist --nojekyll",
+    "stories": "node scripts/build-stories.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",

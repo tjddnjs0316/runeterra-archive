@@ -9,7 +9,7 @@ const CAN_PLAY_OGG = typeof Audio !== 'undefined' && new Audio().canPlayType('au
     도감 화면: 왼쪽 검색·필터·아이콘 목록 + 오른쪽 챔피언 카드
     index(몇 번째 챔피언인지)는 App 이 가지고 있다.
 */
-export default function Dex({champions, factions, index, setIndex, soundOn}) {
+export default function Dex({champions, factions, index, setIndex, soundOn, onOpenRegion, onOpenStory}) {
 
     const [champion, setChampion] = useState(null);   // 현재 챔피언 상세 정보
     const [search, setSearch] = useState('');         // 검색창에 입력한 글자
@@ -179,6 +179,8 @@ export default function Dex({champions, factions, index, setIndex, soundOn}) {
                         faction={faction}
                         champions={champions}
                         onSelect={selectChampion}
+                        onOpenRegion={onOpenRegion}
+                        onOpenStory={onOpenStory}
                         canPlay={CAN_PLAY_OGG}
                         playing={playing}
                         onPlayVoice={() => (playing ? audioRef.current.pause() : playVoice(current))}
