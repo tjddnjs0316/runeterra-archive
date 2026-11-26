@@ -71,7 +71,11 @@ html, body { margin: 0; background: #070b14; }
 
 /* ───────────── 도감 ───────────── */
 .layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 24px; align-items: start; }
-.sidebar { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 32px); }
+/* 왼쪽 칸: 화면 높이에 맞춰 고정하고, 칸 안에서 따로 스크롤한다. (오른쪽 카드는 페이지 스크롤)
+   overscroll-behavior: contain → 왼쪽 끝까지 내려도 페이지(오른쪽)가 같이 내려가지 않는다. */
+.sidebar { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 32px); overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; scrollbar-width: thin; scrollbar-color: rgba(200, 170, 110, 0.35) transparent; }
+/* 이전/다음 버튼은 왼쪽 칸을 내려도 맨 위에 붙어 있게 */
+.sidebar .nav { position: sticky; top: 0; z-index: 2; background: rgba(16, 22, 36, 0.92); }
 .dex-main { scroll-margin-top: 16px; }
 .panel { background: var(--panel); border: 1px solid var(--line-soft); border-radius: 18px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
 .sidebar .panel { padding: 14px; }
@@ -94,8 +98,8 @@ html, body { margin: 0; background: #070b14; }
 .chip.active { background: var(--gold); border-color: var(--gold); color: #1a1408; font-weight: 700; }
 .chip .n { opacity: 0.6; margin-left: 3px; font-size: 11px; }
 
-.grid-panel { flex: 1; min-height: 220px; display: flex; flex-direction: column; overflow: hidden; }
-.champ-grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px 8px; align-content: start; padding: 4px 2px; }
+.grid-panel { flex: none; }
+.champ-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px 8px; align-content: start; padding: 4px 2px; }
 .champ-grid .empty { grid-column: 1 / -1; text-align: center; }
 .champ { background: transparent; border: 0; padding: 0; color: inherit; cursor: pointer; text-align: center; font: inherit; min-width: 0; }
 .champ img { width: 100%; aspect-ratio: 1; border-radius: 12px; border: 2px solid transparent; display: block; transition: transform 0.15s, border-color 0.15s; }
@@ -274,8 +278,11 @@ html, body { margin: 0; background: #070b14; }
 /* ───────────── 반응형 ───────────── */
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; max-height: none; }
-  .grid-panel { max-height: 360px; }
+  /* 좁은 화면(휴대폰)은 위아래로 쌓이므로 왼쪽 칸 스크롤을 풀고, 아이콘 목록만 높이를 제한해 그 안에서 스크롤한다. */
+  .sidebar { position: static; max-height: none; overflow: visible; padding-right: 0; }
+  .sidebar .nav { position: static; }
+  .grid-panel { max-height: 360px; display: flex; flex-direction: column; overflow: hidden; }
+  .champ-grid { flex: 1; min-height: 0; overflow-y: auto; }
 }
 @media (max-width: 560px) {
   .lol-inner { padding: 20px 14px 32px; }
