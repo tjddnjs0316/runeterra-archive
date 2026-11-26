@@ -1,17 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TAG_KO, iconUrl, loadStories, loadingUrl, passiveUrl, spellUrl, splashUrl, stripTags, toParagraphs } from '../lol/api.js';
 import { StoryCard } from './Regions.jsx';
 // 챔피언 사이의 관계 설명 { Garen: { Lux: { label: '여동생', desc: '...' }, ... }, ... }
 // JSON 파일은 import 하면 바로 객체로 들어온다. (Vite 가 처리해 준다)
 import RELATIONS from '../lol/relations.json';
-
-// 그림 위로 떠오르는 불씨 14개. 위치·속도·크기를 처음 한 번만 무작위로 정해 둔다. (렌더링마다 바뀌지 않게 컴포넌트 밖에)
-const EMBERS = Array.from({length: 14}, () => ({
-    left: Math.random() * 100,
-    delay: Math.random() * 8,
-    duration: 6 + Math.random() * 6,
-    size: 2 + Math.round(Math.random() * 3),
-}));
 
 // 스킬 한 줄: 아이콘 + 단축키 + 이름 + (재사용 대기시간) + 설명
 function SkillRow({keyName, name, description, imgSrc, cooldown}) {
@@ -64,19 +56,6 @@ export default function ChampionCard({champion, summary, faction, champions, onS
     const [expanded, setExpanded] = useState(false);
     // 이 챔피언이 나오는 단편 소설
     const [stories, setStories] = useState([]);
-
-    // 마우스 위치(-0.5 ~ 0.5)를 CSS 변수로 넘긴다. state 를 쓰면 마우스가 움직일 때마다 다시 렌더링되므로 DOM 에 바로 넣는다.
-    const heroRef = useRef(null);
-    function handleHeroMove(e) {
-        const rect = heroRef.current.getBoundingClientRect();
-        heroRef.current.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width - 0.5).toFixed(3));
-        heroRef.current.style.setProperty('--my', ((e.clientY - rect.top) / rect.height - 0.5).toFixed(3));
-    }
-    function resetHeroMove() {
-        heroRef.current.style.setProperty('--mx', 0);
-        heroRef.current.style.setProperty('--my', 0);
-    }
-
     useEffect(() => {
         let ignore = false;
         loadStories()
@@ -112,22 +91,8 @@ export default function ChampionCard({champion, summary, faction, champions, onS
 
     return (
         <article className="card">
-            {/*
-                그림 모션
-                1) 처음 뜰 때 크게 → 제자리로 들어오고(hero-in), 그 뒤로 천천히 확대·이동을 반복한다(hero-drift). CSS 애니메이션
-                2) 마우스를 움직이면 그림이 반대쪽으로 살짝 밀린다(시차 효과). 마우스 위치를 CSS 변수 --mx, --my 로 넘긴다.
-                3) 불씨 입자가 아래에서 위로 떠오른다.
-                스킨을 바꾸면 img 의 key 가 바뀌어 들어오는 모션이 다시 실행된다.
-            */}
-            <div className="hero" ref={heroRef} onMouseMove={handleHeroMove} onMouseLeave={resetHeroMove}>
-                <div className="hero-motion">
-                    <img key={skinNum} src={splashUrl(champion.id, skinNum)} alt={champion.name}/>
-                </div>
-                <div className="hero-embers" aria-hidden="true">
-                    {EMBERS.map((e, i) => (
-                        <i key={i} style={{left: `${e.left}%`, animationDelay: `${e.delay}s`, animationDuration: `${e.duration}s`, width: e.size, height: e.size}}/>
-                    ))}
-                </div>
+            <div className="hero">
+                <img src={splashUrl(champion.id, skinNum)} alt={champion.name}/>
                 <div className="hero-shade"/>
                 <div className="hero-text">
                     <p className="eyebrow">{summary.enName}</p>

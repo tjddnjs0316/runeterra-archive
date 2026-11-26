@@ -9,7 +9,7 @@ import MusicPlayer from './MusicPlayer.jsx';
     본문은 열 때 유니버스에서 받아 온다.
 */
 export default function StoryReader({story, onClose, soundOn}) {
-    // 소설 배경음악: 등장 챔피언의 소속 지역 음악 (무소속처럼 곡이 없는 지역이면 음악 없음)
+    // 소설 배경음악: 등장 챔피언의 소속 지역 음악 (regionMusic.js)
     const music = story.regions.map(r => REGION_MUSIC[r]).find(Boolean);
     const [data, setData] = useState(null);
     const [failed, setFailed] = useState(false);
