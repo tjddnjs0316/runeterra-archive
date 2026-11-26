@@ -37,10 +37,22 @@ html, body { margin: 0; background: #070b14; }
 .lol-logo small { font-family: 'Cinzel', serif; letter-spacing: 0.32em; color: var(--gold); font-size: 12px; }
 .lol-logo h1 { margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -0.02em;
   background: linear-gradient(180deg, var(--gold-light), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.tabs { display: flex; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); backdrop-filter: blur(12px); }
-.tab { border: 0; background: transparent; color: var(--muted); padding: 8px 20px; border-radius: 999px; font: inherit; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-.tab:hover { color: var(--text); }
-.tab.active { background: linear-gradient(180deg, #d4b77c, #a07f45); color: #1a1408; }
+.sound-toggle { border: 1px solid var(--line-soft); background: var(--panel); color: var(--muted); padding: 8px 16px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; backdrop-filter: blur(12px); transition: 0.2s; }
+.sound-toggle:hover { color: var(--text); border-color: var(--line); }
+.sound-toggle.on { color: var(--gold-light); border-color: var(--line); background: rgba(200, 170, 110, 0.14); }
+
+/* 카드 오른쪽 위 "선택 대사" 버튼 + 소리 막대 */
+.voice-btn { position: absolute; top: 16px; right: 16px; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(7, 11, 20, 0.55); color: var(--gold-light); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; backdrop-filter: blur(8px); transition: 0.2s; }
+.voice-btn:hover:not(:disabled) { border-color: var(--gold); background: rgba(7, 11, 20, 0.75); }
+.voice-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.voice-btn.playing { border-color: var(--gold); box-shadow: 0 0 20px rgba(200, 170, 110, 0.35); }
+.voice-bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
+.voice-bars i { width: 3px; height: 40%; border-radius: 2px; background: var(--gold); }
+.voice-btn.playing .voice-bars i { animation: voice-bar 0.9s ease-in-out infinite; }
+.voice-btn.playing .voice-bars i:nth-child(2) { animation-delay: 0.15s; }
+.voice-btn.playing .voice-bars i:nth-child(3) { animation-delay: 0.3s; }
+.voice-btn.playing .voice-bars i:nth-child(4) { animation-delay: 0.45s; }
+@keyframes voice-bar { 0%, 100% { height: 30%; } 50% { height: 100%; } }
 
 /* ───────────── 공통 버튼 ───────────── */
 .btn { border: 1px solid var(--line); background: rgba(255, 255, 255, 0.04); color: var(--gold-light); padding: 8px 16px; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; transition: 0.15s; }
@@ -159,88 +171,6 @@ html, body { margin: 0; background: #070b14; }
 .spinner { width: 34px; height: 34px; margin: 0 auto 14px; border-radius: 50%; border: 3px solid rgba(200, 170, 110, 0.2); border-top-color: var(--gold); animation: lol-spin 0.8s linear infinite; }
 @keyframes lol-spin { to { transform: rotate(360deg); } }
 
-/* ───────────── 게임 공통 (퀴즈·추리) ───────────── */
-.game-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
-.game-top h2 { margin: 0; font-size: 24px; }
-.game-top p { margin: 2px 0 0; font-size: 14px; }
-.score { display: flex; gap: 8px; }
-.score div { padding: 8px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line-soft); text-align: center; min-width: 76px; }
-.score small { display: block; font-size: 11px; color: var(--muted); }
-.score b { font-size: 20px; color: var(--gold-light); }
-.zoom { aspect-ratio: 1215 / 717; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; }
-.zoom img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.hint { display: inline-block; padding: 8px 14px; border-radius: 10px; background: rgba(10, 200, 185, 0.08); border: 1px dashed rgba(10, 200, 185, 0.45); font-size: 14px; color: #bff3ee; }
-.hint.locked { background: transparent; border-color: var(--line-soft); color: var(--muted); font-size: 12px; }
-
-/* 퀴즈 */
-.quiz { max-width: 780px; margin: 0 auto; }
-.quiz .hint { display: block; margin-top: 14px; }
-.quiz-card { padding: 24px; animation: lol-rise 0.35s ease; }
-.quiz-q { margin: 0 0 4px; color: var(--gold); font-size: 12px; letter-spacing: 0.16em; font-weight: 700; }
-.quiz-prompt { margin: 0 0 18px; font-size: 22px; font-weight: 700; }
-.big-title { padding: 44px 20px; text-align: center; border-radius: 14px; border: 1px solid var(--line); background: radial-gradient(circle at 50% 0%, rgba(200, 170, 110, 0.2), transparent 70%); font-size: clamp(26px, 5vw, 40px); font-weight: 900; color: var(--gold-light); }
-.big-skill { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 32px; border-radius: 14px; border: 1px solid var(--line); background: radial-gradient(circle at 50% 0%, rgba(10, 200, 185, 0.16), transparent 70%); }
-.big-skill img { width: 96px; height: 96px; border-radius: 16px; border: 2px solid var(--gold); box-shadow: 0 0 30px rgba(200, 170, 110, 0.3); }
-.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
-.choice { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line-soft); background: rgba(255, 255, 255, 0.04); color: var(--text); font: inherit; font-weight: 700; text-align: left; cursor: pointer; transition: 0.15s; }
-.choice small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
-.choice:hover:not(:disabled) { border-color: var(--gold); background: rgba(200, 170, 110, 0.1); transform: translateY(-1px); }
-.choice:disabled { cursor: default; }
-.choice.correct { border-color: var(--ok); background: rgba(47, 191, 113, 0.16); }
-.choice.wrong { border-color: var(--danger); background: rgba(229, 72, 77, 0.16); }
-.choice.dim { opacity: 0.4; }
-.result { margin-top: 16px; display: flex; gap: 14px; align-items: center; padding: 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-soft); animation: lol-rise 0.3s ease; }
-.result img { width: 64px; height: 64px; border-radius: 12px; }
-.result h4 { margin: 0; font-size: 18px; }
-.result.ok h4 { color: var(--ok); }
-.result.no h4 { color: #ff8a8d; }
-.result p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-.quiz-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; flex-wrap: wrap; }
-
-/* ───────────── 추리 게임 ───────────── */
-.guess { max-width: 920px; margin: 0 auto; }
-.mode-switch { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.mode-switch .chip { font-size: 13px; padding: 5px 14px; }
-
-.guess-input { padding: 16px; position: relative; }
-.suggest { list-style: none; margin: 8px 0 0; padding: 6px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px; }
-.suggest button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
-.suggest button:hover { background: rgba(200, 170, 110, 0.12); }
-.suggest li:first-child button { background: rgba(200, 170, 110, 0.08); }
-.suggest img { width: 32px; height: 32px; border-radius: 8px; }
-.suggest span { font-weight: 700; font-size: 14px; }
-.suggest small { color: var(--muted); font-size: 11px; margin-left: auto; }
-.hints { margin-top: 12px; }
-.hint-zoom { margin-top: 12px; max-width: 360px; }
-
-.board { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; overflow-x: auto; }
-.board-head, .board-row { display: grid; grid-template-columns: 1.4fr 1fr 1.3fr 0.9fr 0.9fr 0.9fr; gap: 6px; min-width: 620px; }
-.board-head span { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; text-align: center; }
-.board-head span:first-child { text-align: left; padding-left: 8px; }
-.cell { min-height: 58px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px; border-radius: 10px; font-size: 13px; font-weight: 700; line-height: 1.3; color: #fff;
-  animation: cell-flip 0.5s ease both; }
-.cell.ok { background: var(--ok-bg); box-shadow: inset 0 0 0 1px rgba(47, 191, 113, 0.6); }
-.cell.part { background: var(--part-bg); box-shadow: inset 0 0 0 1px rgba(240, 198, 80, 0.6); }
-.cell.no { background: var(--no-bg); box-shadow: inset 0 0 0 1px rgba(229, 72, 77, 0.45); }
-.champ-cell { justify-content: flex-start; gap: 10px; background: var(--panel); border: 1px solid var(--line-soft); animation: lol-rise 0.3s ease both; }
-.champ-cell img { width: 40px; height: 40px; border-radius: 8px; }
-@keyframes cell-flip { from { opacity: 0; transform: rotateX(90deg); } to { opacity: 1; transform: none; } }
-
-.win { overflow: hidden; animation: lol-rise 0.4s ease; }
-.win-art { aspect-ratio: 1215 / 520; background: center 20% / cover no-repeat; position: relative; display: flex; align-items: flex-end; }
-.win-art::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(7, 11, 20, 0.9)); }
-.win-text { position: relative; padding: 20px 24px; }
-.win-text h3 { margin: 0; font-size: clamp(30px, 5vw, 46px); font-weight: 900; line-height: 1.1; }
-.win-text p { margin: 4px 0 0; color: var(--gold-light); }
-.win-actions { padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-
-.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; }
-.legend span { display: inline-flex; align-items: center; gap: 6px; }
-.dot { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
-.dot.ok { background: var(--ok-bg); }
-.dot.part { background: var(--part-bg); }
-.dot.no { background: var(--no-bg); }
-
 /* ───────────── 반응형 ───────────── */
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
@@ -251,6 +181,4 @@ html, body { margin: 0; background: #070b14; }
   .lol-inner { padding: 20px 14px 32px; }
   .section { padding: 22px 18px; }
   .hero-text { left: 18px; right: 18px; bottom: 14px; }
-  .choices { grid-template-columns: 1fr; }
-  .tab { padding: 8px 14px; }
 }

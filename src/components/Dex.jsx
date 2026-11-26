@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import ChampionCard from './ChampionCard.jsx';
-import { TAG_KO, iconUrl, loadChampionDetail, matchName } from '../lol/api.js';
+import { TAG_KO, iconUrl, loadChampionDetail, matchName, voiceUrl } from '../lol/api.js';
+
+// 이 브라우저가 ogg(Vorbis) 소리를 재생할 수 있는지. 빈 글자('')면 못 한다.
+const CAN_PLAY_OGG = typeof Audio !== 'undefined' && new Audio().canPlayType('audio/ogg; codecs="vorbis"') !== '';
 
 /*
     도감 화면: 왼쪽 검색·필터·아이콘 목록 + 오른쪽 챔피언 카드
-    index(몇 번째 챔피언인지)는 App 이 가지고 있다. 퀴즈·추리 게임에서 "도감에서 보기"를 누르면 App 이 index 를 바꾼다.
+    index(몇 번째 챔피언인지)는 App 이 가지고 있다.
 */
-export default function Dex({champions, factions, index, setIndex}) {
+export default function Dex({champions, factions, index, setIndex, soundOn}) {
 
     const [champion, setChampion] = useState(null);   // 현재 챔피언 상세 정보
     const [search, setSearch] = useState('');         // 검색창에 입력한 글자
@@ -36,9 +39,45 @@ export default function Dex({champions, factions, index, setIndex}) {
         })
         : [];
 
-    // 아이콘·관련 챔피언 클릭 / 엔터: 고른 챔피언이 전체 목록에서 몇 번째인지 찾아 index 로 바꾼다.
+    /*
+        선택 대사 재생
+        Audio 객체 하나를 useRef 에 담아 두고 계속 다시 쓴다. (챔피언을 바꾸면 이전 소리를 멈추고 새 소리를 튼다)
+        브라우저는 사용자가 클릭하지 않았는데 소리를 내는 것(자동 재생)을 막는다.
+        그래서 화면이 처음 뜰 때는 틀지 않고, 버튼·아이콘을 클릭한 그 순간(onClick 안)에만 튼다.
+    */
+    const audioRef = useRef(null);
+    const [playing, setPlaying] = useState(false);   // 지금 대사가 나오는 중인지 (버튼 모양에 쓴다)
+
+    function playVoice(c) {
+        if (!CAN_PLAY_OGG) return;
+        if (!audioRef.current) {
+            const audio = new Audio();
+            audio.addEventListener('playing', () => setPlaying(true));
+            audio.addEventListener('pause', () => setPlaying(false));
+            audio.addEventListener('ended', () => setPlaying(false));
+            audio.addEventListener('error', () => setPlaying(false));
+            audioRef.current = audio;
+        }
+        const audio = audioRef.current;
+        audio.pause();
+        audio.src = voiceUrl(c);
+        // play() 는 Promise 를 돌려준다. 막히거나 실패해도 화면이 멈추지 않도록 catch 로 받는다.
+        audio.play().catch(() => setPlaying(false));
+    }
+
+    // 화면에서 사라질 때 소리를 멈춘다.
+    useEffect(() => () => audioRef.current?.pause(), []);
+
+    // 챔피언 바꾸기: 이전/다음·아이콘·관계 카드·검색 엔터가 모두 이 함수를 거친다.
+    function goTo(i) {
+        setIndex(i);
+        if (soundOn) playVoice(champions[i]);
+        else audioRef.current?.pause();
+    }
+
+    // 아이콘·관련 챔피언 클릭 / 엔터: 고른 챔피언이 전체 목록에서 몇 번째인지 찾아 바꾼다.
     function selectChampion(c) {
-        setIndex(champions.indexOf(c));
+        goTo(champions.indexOf(c));
         // 카드 윗부분이 화면 위로 지나가 있으면(아래로 스크롤해서 읽던 중이면) 카드 맨 위로 올려 준다.
         if (mainRef.current && mainRef.current.getBoundingClientRect().top < 0) {
             mainRef.current.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -65,9 +104,9 @@ export default function Dex({champions, factions, index, setIndex}) {
         <div className="layout">
             <aside className="sidebar">
                 <div className="panel nav">
-                    <button className="btn" onClick={() => setIndex(index - 1)} disabled={index === 0}>← 이전</button>
+                    <button className="btn" onClick={() => goTo(index - 1)} disabled={index === 0}>← 이전</button>
                     <span className="pos"><b>{index + 1}</b> / {champions.length}</span>
-                    <button className="btn" onClick={() => setIndex(index + 1)} disabled={index === champions.length - 1}>다음 →</button>
+                    <button className="btn" onClick={() => goTo(index + 1)} disabled={index === champions.length - 1}>다음 →</button>
                 </div>
 
                 <div className="panel">
@@ -140,6 +179,9 @@ export default function Dex({champions, factions, index, setIndex}) {
                         faction={faction}
                         champions={champions}
                         onSelect={selectChampion}
+                        canPlay={CAN_PLAY_OGG}
+                        playing={playing}
+                        onPlayVoice={() => (playing ? audioRef.current.pause() : playVoice(current))}
                     />
                 )}
             </main>

@@ -30,6 +30,12 @@ export const loadingUrl = (id, num = 0) => `${CDN}/img/champion/loading/${id}_${
 export const passiveUrl = file => `${CDN}/${version}/img/passive/${file}`;
 export const spellUrl = file => `${CDN}/${version}/img/spell/${file}`;
 
+// 챔피언 선택 대사 (한국어 음성)
+// Data Dragon 에는 소리가 없어서, 게임 파일을 공개하는 CommunityDragon 의 파일을 쓴다.
+// 파일 이름은 영문 id 가 아니라 숫자 key 이다. (가렌 = 86) key 는 champion.json 에 들어 있다.
+export const voiceUrl = c =>
+    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/ko_kr/v1/champion-choose-vo/${c.key}.ogg`;
+
 // tags(역할)는 ko_KR 로 요청해도 영어로 오므로 직접 바꿔준다.
 export const TAG_KO = {
     Fighter: '전사', Tank: '탱커', Mage: '마법사',

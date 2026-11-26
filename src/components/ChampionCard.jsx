@@ -51,7 +51,7 @@ function RegionCard({faction}) {
     );
 }
 
-export default function ChampionCard({champion, summary, faction, champions, onSelect}) {
+export default function ChampionCard({champion, summary, faction, champions, onSelect, canPlay, playing, onPlayVoice}) {
 
     // 지금 크게 보여줄 스킨 번호 (0 = 기본 스킨)
     const [skinNum, setSkinNum] = useState(0);
@@ -97,6 +97,16 @@ export default function ChampionCard({champion, summary, faction, champions, onS
                         {champion.tags.map(tag => <span key={tag} className="badge">{TAG_KO[tag] ?? tag}</span>)}
                     </div>
                 </div>
+                {/* 선택 대사 듣기: 재생 중이면 소리 막대가 움직이고, 다시 누르면 멈춘다. */}
+                <button
+                    className={playing ? 'voice-btn playing' : 'voice-btn'}
+                    onClick={onPlayVoice}
+                    disabled={!canPlay}
+                    title={canPlay ? '챔피언 선택 대사 듣기' : '이 브라우저는 ogg 소리를 재생할 수 없어요'}
+                >
+                    <span className="voice-bars" aria-hidden="true"><i/><i/><i/><i/></span>
+                    {playing ? '멈춤' : '선택 대사'}
+                </button>
             </div>
 
             <section className="section">
